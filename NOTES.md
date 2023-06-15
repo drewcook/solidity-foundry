@@ -21,6 +21,19 @@ Use AI prompting to get help along the way:
 5. Post in StackExchange or Peeranha
 6. Post an issue on Github/git
 
+## Dev Security
+
+**Rule about private keys: never have it in plain text anywhere**
+
+1. For the time being for local dev, it is _fine_ to put a `$PRIVATE_KEY` from an Anvil (Foundry) test account in a `.env` file that is protected with `.gitignore`.
+   1. This can now be used in command line scripts without having to expose them to the terminal (i.e. `forge script ./Script.s.sol --rpc-url localhost --broadcast --private-key $PRIVATE_KEY`)
+   2. This assumes of also using `--rpc-url` and having a local instance of `anvil` running
+   3. Delete the bash history after using `history -c`
+2. For deployments to testnets and mainnets using real funds, use an account that is not your main account and has very little funds in it, but enough to cover deployment costs. For testnets, this is less of a concern but still good practice. Here are a few options:
+   1. Use `forge script --interactive` instead, which will launch it's own instance of `anvil`, run the script, then destroy the instance afterwards. We would use the private key to the account, but not expose it externally to anything.
+   2. Use an encrypted keystore file with a password once foundry adds that to the roadmap, or using `dapptools/ethsign import`. This is a password-protected file that contains the private key, stored locally on the computer.
+   3. Use [ThirdWeb](https://thirdweb.com/deploy) to deploy a contract without any setup, RPC URLs, scripting, and without exposing any private key.
+
 ## Challenges
 
 1. Lesson 1 -
