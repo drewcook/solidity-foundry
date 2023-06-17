@@ -34,6 +34,13 @@ Use AI prompting to get help along the way:
    2. Use an encrypted keystore file with a password once foundry adds that to the roadmap, or using `dapptools/ethsign import`. This is a password-protected file that contains the private key, stored locally on the computer.
    3. Use [ThirdWeb](https://thirdweb.com/deploy) to deploy a contract without any setup, RPC URLs, scripting, and without exposing any private key.
 
+## Testing Contracts
+
+1. Unit - testing a specific part of code, i.e. a single function
+2. Integration - testing how part of code work with other parts, i.e. multiple contracts
+3. Forked - testing in a simulated real environment, i.e. a public testnet using `--fork-url` flag and using a NaaS RPC
+4. Staging - testing in a real environment that is not prod, i.e. running tests within a public testnet directly
+
 ## Challenges
 
 1. Lesson 1 -
