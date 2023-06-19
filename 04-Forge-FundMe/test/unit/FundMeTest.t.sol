@@ -95,13 +95,13 @@ contract FundMeTest is Test {
         );
     }
 
-    // function testDepositEmitsEvent() public payable {
-    //     vm.expectEmit();
-    //     emit Fund(DEPOSITOR, SEND_AMOUNT);
-    //     vm.deal(DEPOSITOR, SEND_AMOUNT);
-    //     vm.prank(DEPOSITOR);
-    //     fundMe.fund{value: SEND_AMOUNT}();
-    // }
+    function testDepositEmitsEvent() public payable {
+        vm.expectEmit(address(fundMe));
+        emit Fund(DEPOSITOR, SEND_AMOUNT);
+        vm.deal(DEPOSITOR, SEND_AMOUNT);
+        vm.prank(DEPOSITOR);
+        fundMe.fund{value: SEND_AMOUNT}();
+    }
 
     function testWithdrawNonOwner() public funded {
         vm.prank(DEPOSITOR);
@@ -114,6 +114,8 @@ contract FundMeTest is Test {
         uint256 ownerBalance_before = fundMe.getOwner().balance;
         uint256 contractBalance_before = address(fundMe).balance;
         // Act
+        vm.expectEmit(address(fundMe));
+        emit Withdraw(fundMe.getOwner(), contractBalance_before);
         vm.prank(fundMe.getOwner());
         fundMe.withdraw();
         // Assert
