@@ -7,3 +7,6 @@
 [submodule "04-Forge-FundMe/lib/chainlink-brownie-contracts"]
 	path = 04-Forge-FundMe/lib/chainlink-brownie-contracts
 	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
+[submodule "04-Forge-FundMe/lib/foundry-devops"]
+	path = 04-Forge-FundMe/lib/foundry-devops
+	url = https://github.com/ChainAccelOrg/foundry-devops

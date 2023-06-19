@@ -2,6 +2,7 @@
 pragma solidity ^0.8.18;
 
 // Deploying our own network configs
+// This allows us to run tests against forked chains using real price feed contracts that are deployed on the chain being forked
 // 1. Deploy mocks when we are on local anvil chain and/or testing
 // 2. Keep track of contract addresses across different chains
 //    - price feeds, vrfs, gas price, etc
@@ -11,6 +12,7 @@ pragma solidity ^0.8.18;
 import {Script} from "forge-std/Script.sol";
 import {MockV3Aggregator} from "../test/mocks/MockV3Aggregator.sol";
 
+// Network Config entity
 struct NetworkConfig {
     address priceFeed; // ETH/USD chainlink price feed address
 }
@@ -20,7 +22,7 @@ contract NetworkConfigHelper is Script {
     // Otherwise use the price feeds from the public network
     NetworkConfig public activeConfig;
 
-    // Maintain readable code for magic numbers
+    // Maintain readable code for magic numbers using constants
     uint8 public constant DECIMALS = 8;
     int256 public constant INITIAL_PRICE = 2000e8;
 
@@ -32,13 +34,14 @@ contract NetworkConfigHelper is Script {
         } else if (block.chainid == 5) {
             activeConfig = getGoerliEthConfig();
         } else {
-            activeConfig = getAnvilEthConfig();
+            activeConfig = getOrCreateAnvilEthConfig();
         }
     }
 
     // Anvil (local)
-    function getAnvilEthConfig() public returns (NetworkConfig memory) {
-        // Check if we've set the price feed, if so return it to save on execution
+    // Creates a mock of the price feed contract and deploys it so it can be used for the network config
+    function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory) {
+        // Check if we've set the price feed, if so return it to save on gas/execution costs
         if (activeConfig.priceFeed != address(0)) {
             return activeConfig;
         }

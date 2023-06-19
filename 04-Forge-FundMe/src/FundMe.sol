@@ -11,31 +11,29 @@ contract FundMe {
     using PriceConverter for uint256;
 
     uint256 public constant MINIMUM_USD = 5e18; // $5
-    address public immutable i_owner;
+    address private immutable i_owner; // using i_ and s_ style guide from Chainlink
+
+    // Private variables are more gas efficient
     AggregatorV3Interface private s_priceFeed;
+    address[] private s_funders;
+    mapping(address funder => uint256 amountFunded) private s_donations;
 
-    address[] public s_funders;
-    mapping(address funder => uint256 amountFunded) public s_donations;
-
-    constructor(address _priceFeed) {
-        i_owner = msg.sender;
-        s_priceFeed = AggregatorV3Interface(_priceFeed);
-    }
-
+    // Events
     event Fund(address depositor, uint256 amount);
     event Withdraw(address withdrawer, uint256 amount);
 
     modifier onlyOwner() {
-        // require(msg.sender == i_owner, "Action not permitted");
         if (msg.sender != i_owner) {
             revert FundMe__NotOwner();
         }
         _;
     }
 
-    // Fallback/recieve functions - if someone accidentily sends ETH without calling fund() function, auto-route them
-    // This adds business logic in around arbitrarily someone sending money (i.e. Send on MetaMask, which doesn't call any particular function)
-    // In this case, use the business logic on adding them in as a new funder and their s_donations balance
+    constructor(address _priceFeed) {
+        i_owner = msg.sender;
+        s_priceFeed = AggregatorV3Interface(_priceFeed);
+    }
+
     receive() external payable {
         fund();
     }
@@ -44,11 +42,25 @@ contract FundMe {
         fund();
     }
 
+    // View / Pure functions (Getters)
+    function getDonationAmount(address funder) external view returns (uint256) {
+        return s_donations[funder];
+    }
+
+    function getFunder(uint256 index) external view returns (address) {
+        return s_funders[index];
+    }
+
+    function getOwner() external view returns (address) {
+        return i_owner;
+    }
+
+    // Get the version of the price feed
     function getVersion() public view returns (uint256) {
         return s_priceFeed.version();
     }
 
-    // Take in ETH and keep track of the funder
+    // Take in ETH and keep track of the funder(s) and depositor
     function fund() public payable {
         require(
             msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
@@ -59,33 +71,35 @@ contract FundMe {
         emit Fund(msg.sender, msg.value);
     }
 
-    // Withdraw the funds to the owner
-    // Reset the values for each depositor
     function withdraw() public onlyOwner {
-        // Reset for each funder on their amount donated
-        // (start idx, end idx, incrementer)
+        // Reset the donations and funders
         for (uint256 funderIdx = 0; funderIdx < s_funders.length; funderIdx++) {
             address funder = s_funders[funderIdx];
             s_donations[funder] = 0;
         }
-
-        // Clear out the s_funders array by resetting it to a brand new instance
         s_funders = new address[](0);
 
-        // Withdraw out and transfer to owner
+        // Transfer contract balance to owner
         uint256 withdrawAmount = address(this).balance;
-
-        // we could use transfer()
-        // payable(msg.sender).transfer(withdrawAmount);
-
-        // or send()
-        // bool success = payable(msg.sender).send(withdrawAmount);
-        // require(success, "Send failed");
-
-        // but it is best practice to use call{value: x}("")
         (bool ok, ) = payable(i_owner).call{value: withdrawAmount}("");
         require(ok, "Withdraw failed");
 
+        emit Withdraw(i_owner, withdrawAmount);
+    }
+
+    function cheaperWithdraw() public onlyOwner {
+        // Convert storage read to a memory read so that it only occurs once and not on each iteration
+        uint256 fundersLength = s_funders.length;
+        for (uint256 funderIdx = 0; funderIdx < fundersLength; funderIdx++) {
+            address funder = s_funders[funderIdx];
+            s_donations[funder] = 0;
+        }
+
+        // The rest of the calls are the same, no way to optimize them
+        s_funders = new address[](0);
+        uint256 withdrawAmount = address(this).balance;
+        (bool ok, ) = payable(i_owner).call{value: withdrawAmount}("");
+        require(ok, "Withdraw failed");
         emit Withdraw(i_owner, withdrawAmount);
     }
 }

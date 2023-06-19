@@ -7,13 +7,15 @@ import {NetworkConfigHelper} from "./NetworkConfigHelper.s.sol";
 
 contract DeployFundMe is Script {
     function run() external returns (FundMe) {
-        // Before startBroadcast - fake txs
+        // Before startBroadcast - "fake" txs w/ no gas cost
+        // Get priceFeed value from the network config struct
         NetworkConfigHelper networks = new NetworkConfigHelper();
-        address priceFeedEthUsd = networks.activeConfig();
+        address priceFeed = networks.activeConfig();
 
         // After startBroadcast - real txs costing real gas
+        // Deploy FundMe contract using the network config's price feed
         vm.startBroadcast();
-        FundMe fundMe = new FundMe(priceFeedEthUsd);
+        FundMe fundMe = new FundMe(priceFeed);
         vm.stopBroadcast();
         return fundMe;
     }
