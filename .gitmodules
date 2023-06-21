@@ -10,3 +10,15 @@
 [submodule "04-Forge-FundMe/lib/foundry-devops"]
 	path = 04-Forge-FundMe/lib/foundry-devops
 	url = https://github.com/chainaccelorg/foundry-devops
+[submodule "05-Lottery/lib/forge-std"]
+	path = 05-Lottery/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "05-Lottery/lib/chainlink-brownie-contracts"]
+	path = 05-Lottery/lib/chainlink-brownie-contracts
+	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
+[submodule "05-Lottery/lib/solmate"]
+	path = 05-Lottery/lib/solmate
+	url = https://github.com/transmissions11/solmate
+[submodule "05-Lottery/lib/foundry-devops"]
+	path = 05-Lottery/lib/foundry-devops
+	url = https://github.com/chainaccelorg/foundry-devops
