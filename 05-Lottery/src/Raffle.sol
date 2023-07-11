@@ -56,6 +56,7 @@ contract Raffle is VRFConsumerBaseV2 {
     // Events
     event EnterRaffle(address indexed player);
     event PickedWinner(address indexed winner);
+    event RequestedRaffleWinner(uint256 indexed requestId);
 
     constructor(
         uint256 _ticketPrice,
@@ -93,13 +94,13 @@ contract Raffle is VRFConsumerBaseV2 {
 
     // Chainlink Automation - Upkeep callbacks
     /**
-			@dev This is the function called by the Chainlink Automation node(s) to see if it's time to perform an upkeep. The upkeep will end up calling pickWinner().
-			Requirements:
-			1. The time interval has passed between raffle runs
-			2. The raffle status is OPEN
-			3. The contract has both players and an ETH balance
-			4. (Implicit) The subscription is funded with LINK
-		*/
+        @dev This is the function called by the Chainlink Automation node(s) to see if it's time to perform an upkeep. The upkeep will end up calling pickWinner().
+        Requirements:
+        1. The time interval has passed between raffle runs
+        2. The raffle status is OPEN
+        3. The contract has both players and an ETH balance
+        4. (Implicit) The subscription is funded with LINK
+    */
     function checkUpkeep(
         bytes memory /* checkData */
     ) public view returns (bool upkeepNeeded, bytes memory /* performData */) {
@@ -132,13 +133,15 @@ contract Raffle is VRFConsumerBaseV2 {
         // Get a random number from Chainlink VRF (makes a request)
         // 1. Request the RNG
         // 2. Get the random number (callback, tx chainlink node sends back)
-        i_vrfCoordinator.requestRandomWords(
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
             REQUEST_CONFIRMATIONS,
             i_callbackGasLimit,
             NUM_WORDS
         );
+
+        emit RequestedRaffleWinner(requestId);
     }
 
     // Chainlink VRF Callback
@@ -181,5 +184,17 @@ contract Raffle is VRFConsumerBaseV2 {
 
     function getPlayer(uint256 _indexOfPlayer) external view returns (address) {
         return s_players[_indexOfPlayer];
+    }
+
+    function getRecentWinner() external view returns (address) {
+        return s_recentWinner;
+    }
+
+    function getLenghtOfPlayers() external view returns (uint256) {
+        return s_players.length;
+    }
+
+    function getLastTimeStamp() external view returns (uint256) {
+        return s_lastTimeStamp;
     }
 }

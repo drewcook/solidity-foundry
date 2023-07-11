@@ -15,7 +15,7 @@ contract CreateSubscription is Script {
 
     function createSubscriptionFromConfig() internal returns (uint64) {
         HelperConfig helperConfig = new HelperConfig();
-        (, , address vrfCoordinator, , , , ) = helperConfig
+        (, , address vrfCoordinator, , , , , ) = helperConfig
             .activeNetworkConfig();
         return createSubscription(vrfCoordinator);
     }
@@ -58,7 +58,8 @@ contract FundSubscription is Script {
             ,
             uint64 subscriptionId,
             ,
-            address linkToken
+            address linkToken,
+
         ) = helperConfig.activeNetworkConfig();
         fundSubscription(vrfCoordinator, subscriptionId, linkToken);
     }
@@ -110,21 +111,31 @@ contract AddConsumer is Script {
 
     function addConsumerFromConfig(address raffle) internal {
         HelperConfig helperConfig = new HelperConfig();
-        (, , address vrfCoordinator, , uint64 subscriptionId, , ) = helperConfig
-            .activeNetworkConfig();
-        addConsumer(vrfCoordinator, subscriptionId, raffle);
+        (
+            ,
+            ,
+            address vrfCoordinator,
+            ,
+            uint64 subscriptionId,
+            ,
+            ,
+            uint256 deployerKey
+        ) = helperConfig.activeNetworkConfig();
+        addConsumer(vrfCoordinator, subscriptionId, raffle, deployerKey);
     }
 
     function addConsumer(
         address vrfCoordinator,
         uint64 subscriptionId,
-        address raffle
+        address raffle,
+        uint256 deployerKey
     ) public {
         console.log("Adding consumer contract: ", raffle);
         console.log("Using VRFCoordinator: ", vrfCoordinator);
         console.log("On ChainID: ", block.chainid);
         // Call the underlying addConsumer() on the coordinator to add the instance of Raffle as a consumer
-        vm.startBroadcast();
+        // Pass in the private key for the subscription ID owner
+        vm.startBroadcast(deployerKey);
         VRFCoordinatorV2Mock(vrfCoordinator).addConsumer(
             subscriptionId,
             raffle
