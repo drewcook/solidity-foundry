@@ -205,14 +205,23 @@ contract TestRaffle is Test {
         assert(uint256(rState) == 1);
     }
 
-    ////////////////////////
+    ///////////////////////////////
     // fulfillRandomWords() tests
-    ////////////////////////
+    ///////////////////////////////
+
+    // Only run code if we're not on a forked Sepolia network, i.e. only run if on anvil
+    // This is used becuase the VRFCoordinatorV2Mock and real VRFCoordinatorV2 differ in their fn sigs
+    modifier skipFork() {
+        if (block.chainid != 31337) {
+            return;
+        }
+        _;
+    }
 
     // Use fuzz testing and use requestId as the invariant
     function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(
         uint256 randomRequestId
-    ) external raffleEnteredAndTimePassed {
+    ) external raffleEnteredAndTimePassed skipFork {
         // Arrange
         vm.expectRevert("nonexistent request");
         VRFCoordinatorV2Mock(vrfCoordinator).fulfillRandomWords(
@@ -224,6 +233,7 @@ contract TestRaffle is Test {
     function testFulfillRandomWordsPicksWinnerResetsAndSendsMoney()
         external
         raffleEnteredAndTimePassed
+        skipFork
     {
         // Arrange (add some more entrants)
         uint256 additionalEntrants = 5;

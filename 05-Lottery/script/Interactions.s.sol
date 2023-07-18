@@ -15,13 +15,14 @@ contract CreateSubscription is Script {
 
     function createSubscriptionFromConfig() internal returns (uint64) {
         HelperConfig helperConfig = new HelperConfig();
-        (, , address vrfCoordinator, , , , , ) = helperConfig
+        (, , address vrfCoordinator, , , , , uint256 deployerKey) = helperConfig
             .activeNetworkConfig();
-        return createSubscription(vrfCoordinator);
+        return createSubscription(vrfCoordinator, deployerKey);
     }
 
     function createSubscription(
-        address vrfCoordinator
+        address vrfCoordinator,
+        uint256 deployerKey
     ) public returns (uint64) {
         console.log(
             "Created a subscription for given VRF Coordinator on ChainID: ",
@@ -29,7 +30,7 @@ contract CreateSubscription is Script {
         );
 
         // Call the mock and create the subscription
-        vm.startBroadcast();
+        vm.startBroadcast(deployerKey);
         uint64 subscriptionId = VRFCoordinatorV2Mock(vrfCoordinator)
             .createSubscription();
         vm.stopBroadcast();
@@ -59,15 +60,21 @@ contract FundSubscription is Script {
             uint64 subscriptionId,
             ,
             address linkToken,
-
+            uint256 deployerKey
         ) = helperConfig.activeNetworkConfig();
-        fundSubscription(vrfCoordinator, subscriptionId, linkToken);
+        fundSubscription(
+            vrfCoordinator,
+            subscriptionId,
+            linkToken,
+            deployerKey
+        );
     }
 
     function fundSubscription(
         address vrfCoordinator,
         uint64 subscriptionId,
-        address linkToken
+        address linkToken,
+        uint256 deployerKey
     ) public {
         // Run the same actions that the frontend would do on https://vrf.chain.link/sepolia/new
         console.log("Funding subscriptionID: ", subscriptionId);
@@ -88,7 +95,7 @@ contract FundSubscription is Script {
             console.log(address(this));
 
             // Call the real VRFCoordinator on Sepolia using the real token
-            vm.startBroadcast();
+            vm.startBroadcast(deployerKey);
             LinkTokenMock(linkToken).transferAndCall(
                 vrfCoordinator,
                 FUND_AMOUNT,
