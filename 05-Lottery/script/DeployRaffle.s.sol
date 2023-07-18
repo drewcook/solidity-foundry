@@ -27,7 +27,7 @@ contract DeployRaffle is Script {
             uint256 deployerKey
         ) = helperConfig.activeNetworkConfig();
 
-        // Create a subscription if we don't have one defined in our config already
+        // 1. Create a subscription if we don't have one defined in our config already
         if (subscriptionId == 0) {
             CreateSubscription createSubscription = new CreateSubscription();
             subscriptionId = createSubscription.createSubscription(
@@ -44,7 +44,7 @@ contract DeployRaffle is Script {
             );
         }
 
-        // Deploy using config values
+        // 2. Deploy Raffle contract using config values
         vm.startBroadcast();
         Raffle raffle = new Raffle(
             ticketPrice,
@@ -56,7 +56,7 @@ contract DeployRaffle is Script {
         );
         vm.stopBroadcast();
 
-        // Regardless if using an existing subscription or not, wire up our Raffle contract as a consumer to the subscription
+        // 3. Regardless if using an existing subscription or not, wire up our Raffle contract as a consumer to the subscription
         AddConsumer addConsumer = new AddConsumer();
         addConsumer.addConsumer(
             vrfCoordinator,
@@ -64,6 +64,8 @@ contract DeployRaffle is Script {
             address(raffle),
             deployerKey
         );
+
+        // 4. (Optionally) Add in a new upkeep to Chainlink automation, but for testing we act as the upkeeper
 
         // Return the instance
         return (raffle, helperConfig);
