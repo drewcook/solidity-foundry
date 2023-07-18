@@ -1,12 +1,4 @@
-# A Makefile is a special file that contains instructions a computer can follow to automatically perform a specific task.
-
-# Include variables declared in the .env file
 -include .env
-
-# Commands
-deploy-sepolia:
-	forge script script/DeployFundMe.s.sol:DeployFundMe --rpc-url $(ALCHEMY_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
-
 
 .PHONY: all test clean deploy fund help install snapshot format anvil
 
@@ -26,7 +18,7 @@ clean  :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
-install :; forge install chainaccelorg/foundry-devops@0.0.11 --no-commit && forge install smartcontractkit/chainlink-brownie-contracts@0.6.1 --no-commit && forge install foundry-rs/forge-std@v1.5.3 --no-commit
+install :; forge install chainaccelorg/foundry-devops@0.0.11 --no-commit && forge install smartcontractkit/chainlink-brownie-contracts@0.6.1 --no-commit && forge install foundry-rs/forge-std@v1.5.3 --no-commit && forge install transmissions11/solmate@v6 --no-commit
 
 # Update Dependencies
 update:; forge update
@@ -48,10 +40,13 @@ ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
 endif
 
 deploy:
-	@forge script script/DeployFundMe.s.sol:DeployFundMe $(NETWORK_ARGS)
+	@forge script script/DeployRaffle.s.sol:DeployRaffle $(NETWORK_ARGS)
 
-fund:
-	@forge script script/Interactions.s.sol:FundFundMe $(NETWORK_ARGS)
+createSubscription:
+	@forge script script/Interactions.s.sol:CreateSubscription $(NETWORK_ARGS)
 
-withdraw:
-	@forge script script/Interactions.s.sol:WithdrawFundMe $(NETWORK_ARGS)
+addConsumer:
+	@forge script script/Interactions.s.sol:AddConsumer $(NETWORK_ARGS)
+
+fundSubscription:
+	@forge script script/Interactions.s.sol:FundSubscription $(NETWORK_ARGS)
