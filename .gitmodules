@@ -36,4 +36,4 @@
 	url = https://github.com/openzeppelin/openzeppelin-contracts
 [submodule "07-ERC721/lib/foundry-devops"]
 	path = 07-ERC721/lib/foundry-devops
-	url = https://github.com/Cyfrin/foundry-devops
+	url = https://github.com/chainaccelorg/foundry-devops

@@ -8,7 +8,7 @@ help:
 	@echo "Usage:"
 	@echo "  make deploy [ARGS=...]\n    example: make deploy ARGS=\"--network sepolia\""
 	@echo ""
-	@echo "  make mintMoodNft [ARGS=...]\n    example: make deploy ARGS=\"--network sepolia\""
+	@echo "  make mintMoodNft [ARGS=...]\n    example: make mintMoodNft ARGS=\"--network sepolia\""
 
 all: clean remove install update build
 

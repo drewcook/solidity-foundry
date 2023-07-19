@@ -3,7 +3,8 @@ pragma solidity ^0.8.18;
 
 import {ERC721} from "openzeppelin/token/ERC721/ERC721.sol";
 
-// st-bernard: ipfs://QmQDf2BE9RQVtvZLYf5bg37bVt1CRAwzV8dM7FmAxuDXRe
+// Example deployment: https://sepolia.etherscan.io/address/0xB30f444d85420467c020Da0Dd3bB8b7c04b9231F
+// https://testnets.opensea.io/assets/sepolia/0xb30f444d85420467c020da0dd3bb8b7c04b9231f/0
 
 contract BasicNFT is ERC721 {
     // Used as a counter for our token IDs
