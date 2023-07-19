@@ -24,7 +24,7 @@ contract MintBasicNFT is Script {
             "BasicNFT",
             block.chainid
         );
-				console.log(mostRecentDeployment};
+        console.log("most recent deployment: ", mostRecentDeployment);
         mintNftOnContract(mostRecentDeployment);
     }
 }
