@@ -31,3 +31,6 @@
 [submodule "07-ERC721/lib/forge-std"]
 	path = 07-ERC721/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "07-ERC721/lib/openzeppelin-contracts"]
+	path = 07-ERC721/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

@@ -11,6 +11,6 @@ remix*/
 html*/
 background*
 .DS_Store
-img/
+# img/
 brownie-contracts-nfts/
 tweet.md

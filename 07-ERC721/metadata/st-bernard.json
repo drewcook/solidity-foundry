@@ -1,0 +1,23 @@
+{
+	"name": "St. Bernard",
+	"description": "An adorable crypto doggie that will help you find your way home.",
+	"image": "ipfs://QmUPjADFGEKmfohdTaNcWhp7VGk26h5jXDA7v3VtTnTLcW",
+	"attributes": [
+		{
+			"trait_type": "cuteness",
+			"value": 100
+		},
+		{
+			"trait_type": "health",
+			"value": 420
+		},
+		{
+			"trait_type": "eyes",
+			"value": "adorable"
+		},
+		{
+			"trait_type": "genesis",
+			"value": true
+		}
+	]
+}
