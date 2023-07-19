@@ -22,3 +22,6 @@
 [submodule "05-Lottery/lib/foundry-devops"]
 	path = 05-Lottery/lib/foundry-devops
 	url = https://github.com/chainaccelorg/foundry-devops
+[submodule "06-ERC20s/lib/forge-std"]
+	path = 06-ERC20s/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
