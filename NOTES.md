@@ -68,6 +68,31 @@ This is taken from [the Solidity docs](https://docs.soliditylang.org/en/v0.8.7/l
 3. Forked - testing in a simulated real environment, i.e. a public testnet using `--fork-url` flag and using a NaaS RPC
 4. Staging - testing in a real environment that is not prod, i.e. running tests within a public testnet directly
 
+## Verify Metamask Transactions (Security)
+
+When making a transaction via MM, there is a "Hex" tab which contains the input bytecode calldata used. The calldata will contain a function signature at the beginning and any inputs. It is important, when using frontends, that this bytecode is verified and is what is expected. Here are a list of steps you can do to verify that your transaction is indeed safe to submit and that you are not interacting with a bad frontend and stay un-rekt.
+
+1. Check the address
+2. Check the function selector
+   1. It will be the first 4 bytes of the calldata
+   2. Grab the selector and paste it into <https://openchain.xyz/signatures>
+      1. Notice the function signature that comes back.
+      2. There may be multiple signatures using the same selector, but a singular Solidity contract cannot contain multiple functions with the same selector, so find the one tha applies to the contract being called.
+      3. See if the value matches what you expect to be calling from the frontend, eg `"transfer(address,uint256)"`
+   3. Use Foundry Cast to cross-check that the selector in MM matches the signature that you expect it to be using (can be verified in step 2.2 also)
+      1. `cast sig "transferFrom(address,address,uint256)"` => `0x23b872dd`
+      2. Does this match what is in MM? If so, you're good. If not, potential to be rekt.
+3. Decode the calldata to check the parameters being sent
+   1. Use Foundry Cast to decode it with a helper command
+   2. The signature should be stringified, eg `transfer(address,uint256)`
+   3. `cast --calldata-decode <SIG> <CALLDATA>`
+   4. Check that the output parmeters match what you are sending
+
+You can also use this extension to simulate transactions prior to submitting them.
+
+- <https://www.joinfire.xyz/>
+
+
 ## Challenges
 
 1. Lesson 1 -
