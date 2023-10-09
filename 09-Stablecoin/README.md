@@ -10,3 +10,9 @@ Features of this stablecoin:
 3. Collateral: Exogenous (Crypto)
    1. wETH - wrapped ETH (ERC20 version)
    2. wBTC - wrapped BTC (ERC20 version)
+
+---
+
+### Security
+
+1. What are our invariants/properties?

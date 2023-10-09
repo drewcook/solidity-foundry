@@ -278,6 +278,8 @@ contract DSCEngine is ReentrancyGuard {
     /// @return Their health factor
     function _healthFactor(address _user) private view returns (uint256) {
         (uint256 totalDscMinted, uint256 collateralValueInUsd) = _getAccountInformation(_user);
+        // If debt is zero, i.e. depositing lots of collateral but no dsc minted, will divide by zero and break
+        if (totalDscMinted == 0) return type(uint256).max;
         // get the ratio of these two values and in accordance with the liquidation threshold
         uint256 collateralAdjustedForThreshold = (collateralValueInUsd * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
         // $1000 ETH * 50 = 50,000 / $100 DSC = ($500 / 100) > 1 (good)
@@ -336,5 +338,13 @@ contract DSCEngine is ReentrancyGuard {
         // ex. 1 ETH = $1000
         // The returned value from CL will be 1000 * 1e8 (eth/usd price feed has 8 decimals)
         totalUsdValue = (uint256(price) * ADDITIONAL_FEED_PRECISION) * _amount / PRECISION; // (1000 * 1e8 * (1e10)) * 1000 * 1e18
+    }
+
+    function getAccountInformation(address _user)
+        external
+        view
+        returns (uint256 totalDscMinted, uint256 collateralValudInUsd)
+    {
+        (totalDscMinted, collateralValudInUsd) = _getAccountInformation(_user);
     }
 }
