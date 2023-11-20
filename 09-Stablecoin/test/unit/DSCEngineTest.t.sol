@@ -7,6 +7,7 @@ import {DeployDSC} from "../../script/DeployDSC.s.sol";
 import {DecentralizedStablecoin} from "../../src/DecentralizedStablecoin.sol";
 import {DSCEngine} from "../../src/DSCEngine.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
 
 contract DSCEngineTest is Test {
     HelperConfig config;
@@ -35,7 +36,7 @@ contract DSCEngineTest is Test {
     address[] public tokenAddresses;
     address[] public priceFeedAddresses;
 
-    function testReverts_tokenLengthDoesntMatchPriceFeeds() public {
+    function testRevertsIfTokenLengthDoesntMatchPriceFeeds() public {
         tokenAddresses.push(weth);
         priceFeedAddresses.push(ethUsdPriceFeed);
         priceFeedAddresses.push(btcUsdPriceFeed);
@@ -98,6 +99,24 @@ contract DSCEngineTest is Test {
         assertEq(totalDscMinted, expectedTotalDscMinted);
         assertEq(AMOUNT_COLLATERAL, expectedDepositAmount);
     }
+
+    ///////////////////////////////////
+    // depositCollateralAndMintDsc Tests
+    ///////////////////////////////////
+
+    // function testReverstsIfMintedDscBreaksHealthFactor() public {
+    //     (, int256 price,,,) = MockV3Aggregator(ethUsdPriceFeed).latestRoundData();
+    //     uint256 amountToMint =
+    //         (AMOUNT_COLLATERAL * (uint256(price) * engine.getAdditionalFeedPrecision())) / engine.getPrecision();
+    //     vm.startPrank(USER);
+    //     ERC20Mock(weth).approve(address(engine), AMOUNT_COLLATERAL);
+
+    //     uint256 expectedHealthFactor =
+    //         engine.calculateHealthFactor(engine.getUsdValue(weth, AMOUNT_COLLATERAL), amountToMint);
+    //     vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__BreaksHealthFactor.selector, expectedHealthFactor));
+    //     engine.depositCollateralAndMintDSC(weth, AMOUNT_COLLATERAL, amountToMint);
+    //     vm.stopPrank();
+    // }
 
     // TODO: write more unit tests and aim for >85% coverage
     // TODO: write a public calculateHealthFactor function for re-use
