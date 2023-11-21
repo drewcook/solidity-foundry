@@ -26,13 +26,13 @@ contract Invariants is StdInvariant, Test {
     DecentralizedStablecoin dsc;
     HelperConfig config;
     address weth;
-    address btc;
+    address wbtc;
     Handler handler;
 
     function setUp() external {
         deployer = new DeployDSC();
         (dsc, engine, config) = deployer.run();
-        (,, weth, btc,) = config.activeNetworkConfig();
+        (,, weth, wbtc,) = config.activeNetworkConfig();
         // targetContract(address(engine));
         handler = new Handler(engine, dsc);
         targetContract(address(handler));
@@ -42,15 +42,30 @@ contract Invariants is StdInvariant, Test {
         // get the value of all the collateral in protocol
         uint256 totalSupply = dsc.totalSupply();
         uint256 totalWethDeposited = IERC20(weth).balanceOf(address(engine));
-        uint256 totalBtcDeposited = IERC20(btc).balanceOf(address(engine));
+        uint256 totalBtcDeposited = IERC20(wbtc).balanceOf(address(engine));
         uint256 wethValue = engine.getUsdValue(weth, totalWethDeposited);
-        uint256 btcValue = engine.getUsdValue(btc, totalBtcDeposited);
+        uint256 btcValue = engine.getUsdValue(wbtc, totalBtcDeposited);
 
         console.log("weth value", wethValue);
         console.log("btc value", btcValue);
         console.log("total supply", totalSupply);
+        console.log("mint called", handler.timesMintIsCalled());
 
         // compare it to all debt (dsc)
         assert(wethValue + btcValue >= totalSupply);
+    }
+
+    // always include this invariant regardless of the contract
+    function invariant_gettersShouldNotRevert() public view {
+        engine.getAdditionalFeedPrecision();
+        engine.getPrecision();
+        engine.getLiquidationThreshold();
+        engine.getLiquidationPrecision();
+        engine.getLiquidationBonus();
+        engine.getMinHealthFactor();
+        engine.getDsc();
+        engine.getCollateralTokens();
+        engine.getCollateralTokenPriceFeed(weth);
+        engine.getCollateralTokenPriceFeed(wbtc);
     }
 }
