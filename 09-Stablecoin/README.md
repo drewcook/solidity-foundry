@@ -13,6 +13,6 @@ Features of this stablecoin:
 
 ---
 
-### Security
+## Security
 
 1. What are our invariants/properties?

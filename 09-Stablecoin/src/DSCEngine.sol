@@ -280,6 +280,20 @@ contract DSCEngine is ReentrancyGuard {
         collateralValueInUsd = getAccountCollateralValue(_user);
     }
 
+    function _calculateHealthFactor(uint256 _totalDscMinted, uint256 _collateralValueInUsd)
+        internal
+        pure
+        returns (uint256)
+    {
+        // If debt is zero, i.e. depositing lots of collateral but no dsc minted, will divide by zero and break
+        if (_totalDscMinted == 0) return type(uint256).max;
+        // get the ratio of these two values and in accordance with the liquidation threshold
+        uint256 collateralAdjustedForThreshold = (_collateralValueInUsd * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
+        // $1000 ETH * 50 = 50,000 / $100 DSC = ($500 / 100) > 1 (good)
+        // $150 * 50 = 7500 / 100 = ($75/100) < 1 (not good)
+        return (collateralAdjustedForThreshold * PRECISION) / _totalDscMinted;
+    }
+
     /// @notice Returns how close to liquidation a user is. A user's position has a 50% liquidation threshold, meaning they must have double the amount of value in collateral than what they are borrowing.
     /// @notice If a user goes below 1, then they can get liquidated.
     /// @param {address} _user - the address of the account to check for
@@ -301,14 +315,6 @@ contract DSCEngine is ReentrancyGuard {
     //////////////////////////////////////
     /// Pure / View Functions
     //////////////////////////////////////
-
-    function getAccountInformation(address _user)
-        external
-        view
-        returns (uint256 totalDscMinted, uint256 collateralValudInUsd)
-    {
-        (totalDscMinted, collateralValudInUsd) = _getAccountInformation(_user);
-    }
 
     function getAdditionalFeedPrecision() external pure returns (uint256) {
         return ADDITIONAL_FEED_PRECISION;
@@ -348,6 +354,14 @@ contract DSCEngine is ReentrancyGuard {
 
     function getCollateralBalanceOfUser(address _user, address _token) external view returns (uint256) {
         return s_collateralDeposits[_user][_token];
+    }
+
+    function getAccountInformation(address _user)
+        external
+        view
+        returns (uint256 totalDscMinted, uint256 collateralValudInUsd)
+    {
+        (totalDscMinted, collateralValudInUsd) = _getAccountInformation(_user);
     }
 
     function getAccountCollateralValue(address _user) public view returns (uint256 totalCollateralValueInUsd) {
@@ -392,19 +406,5 @@ contract DSCEngine is ReentrancyGuard {
         // ex. 1 ETH = $1000
         // The returned value from CL will be 1000 * 1e8 (eth/usd price feed has 8 decimals)
         totalUsdValue = (uint256(price) * ADDITIONAL_FEED_PRECISION) * _amount / PRECISION; // (1000 * 1e8 * (1e10)) * 1000 * 1e18
-    }
-
-    function _calculateHealthFactor(uint256 _totalDscMinted, uint256 _collateralValueInUsd)
-        internal
-        pure
-        returns (uint256)
-    {
-        // If debt is zero, i.e. depositing lots of collateral but no dsc minted, will divide by zero and break
-        if (_totalDscMinted == 0) return type(uint256).max;
-        // get the ratio of these two values and in accordance with the liquidation threshold
-        uint256 collateralAdjustedForThreshold = (_collateralValueInUsd * LIQUIDATION_THRESHOLD) / LIQUIDATION_PRECISION;
-        // $1000 ETH * 50 = 50,000 / $100 DSC = ($500 / 100) > 1 (good)
-        // $150 * 50 = 7500 / 100 = ($75/100) < 1 (not good)
-        return (collateralAdjustedForThreshold * PRECISION) / _totalDscMinted;
     }
 }
