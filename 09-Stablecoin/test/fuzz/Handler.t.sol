@@ -12,6 +12,12 @@ import {Test} from "forge-std/Test.sol";
 import {DSCEngine} from "../../src/DSCEngine.sol";
 import {DecentralizedStablecoin} from "../../src/DecentralizedStablecoin.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
+
+// What other things that the handler should care about for the system?
+// - Price feed
+// - WBTC
+// - WETH
 
 contract Handler is Test {
     DSCEngine engine;
@@ -23,8 +29,12 @@ contract Handler is Test {
     address[] depositors;
 
     uint256 public timesMintIsCalled; // ghost variable
+    address[] public usersWithCollateralDeposited;
 
     uint256 MAX_DEPOSIT_SIZE = type(uint96).max;
+
+    MockV3Aggregator public ethUsdPriceFeed;
+    MockV3Aggregator public btcUsdPriceFeed;
 
     constructor(DSCEngine _engine, DecentralizedStablecoin _dsc) {
         engine = _engine;
@@ -32,6 +42,8 @@ contract Handler is Test {
         address[] memory collateralTokens = engine.getCollateralTokens();
         weth = ERC20Mock(collateralTokens[0]);
         wbtc = ERC20Mock(collateralTokens[1]);
+        // Get price feeds
+        ethUsdPriceFeed = MockV3Aggregator(engine.getCollateralTokenPriceFeed(address(weth)));
     }
 
     // Constraining major functions
@@ -86,6 +98,12 @@ contract Handler is Test {
         // call it
         engine.redeemCollateral(address(collateral), amountCollateral);
     }
+
+    // Note: This breaks out invariant test suite, due to the fact that if the price of an asset plummets too quickly, the system becomes undercollaterlized
+    // function updateCollateralPrice(uint96 _newPrice) public {
+    //     int256 newPriceInt = int256(uint256(_newPrice));
+    //     ethUsdPriceFeed.updateAnswer(newPriceInt);
+    // }
 
     // Helper functions
 

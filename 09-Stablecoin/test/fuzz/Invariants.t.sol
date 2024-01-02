@@ -35,6 +35,7 @@ contract Invariants is StdInvariant, Test {
         (,, weth, wbtc,) = config.activeNetworkConfig();
         // targetContract(address(engine));
         handler = new Handler(engine, dsc);
+        // Set up the target contract
         targetContract(address(handler));
     }
 
@@ -46,16 +47,16 @@ contract Invariants is StdInvariant, Test {
         uint256 wethValue = engine.getUsdValue(weth, totalWethDeposited);
         uint256 btcValue = engine.getUsdValue(wbtc, totalBtcDeposited);
 
-        console.log("weth value", wethValue);
-        console.log("btc value", btcValue);
-        console.log("total supply", totalSupply);
-        console.log("mint called", handler.timesMintIsCalled());
+        // console.log("weth value", wethValue);
+        // console.log("btc value", btcValue);
+        // console.log("total supply", totalSupply);
+        // console.log("mint called", handler.timesMintIsCalled());
 
         // compare it to all debt (dsc)
         assert(wethValue + btcValue >= totalSupply);
     }
 
-    // always include this invariant regardless of the contract
+    // note: always include this invariant regardless of the contract
     function invariant_gettersShouldNotRevert() public view {
         engine.getAdditionalFeedPrecision();
         engine.getPrecision();

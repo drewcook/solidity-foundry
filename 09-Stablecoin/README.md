@@ -16,3 +16,6 @@ Features of this stablecoin:
 ## Security
 
 1. What are our invariants/properties?
+2. Proper oracle use
+3. Write more tests
+4. Smart Contract Audit Preparation - [checklist](https://github.com/nascentxyz/simple-security-toolkit/blob/main/audit-readiness-checklist.md)
