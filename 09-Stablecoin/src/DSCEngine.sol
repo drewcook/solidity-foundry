@@ -394,7 +394,7 @@ contract DSCEngine is ReentrancyGuard {
      */
     function getTokenAmountFromUsd(address _token, uint256 _usdAmountInWei) public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[_token]);
-        (, int256 price,,,) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
         // $10e18 * 1e18) / ($2000e8 * 1e10)
         return (_usdAmountInWei * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION);
     }
@@ -407,7 +407,7 @@ contract DSCEngine is ReentrancyGuard {
     function getUsdValue(address _token, uint256 _amount) public view returns (uint256 totalUsdValue) {
         // get price for the token
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[_token]);
-        (, int256 price,,,) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.staleCheckLatestRoundData();
         // multiply it by the amount
         // ex. 1 ETH = $1000
         // The returned value from CL will be 1000 * 1e8 (eth/usd price feed has 8 decimals)
