@@ -4,6 +4,8 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 
+// Transparent Proxy
+
 contract SmallProxy is Proxy {
     // This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1
     // note: see https://eips.ethereum.org/EIPS/eip-1967#logic-contract-address
@@ -31,6 +33,8 @@ contract SmallProxy is Proxy {
             valueAtStorageSlotZero := sload(0)
         }
     }
+
+    receive() external payable {}
 }
 
 contract ImplementationA {
@@ -39,6 +43,9 @@ contract ImplementationA {
     function setValue(uint256 newValue) public {
         value = newValue;
     }
+
+    // This function will never be called, because the proxy has one with the same name, so never use functions in the implementation if the same name exists in the proxy, rename it.
+    function setImplementation() external {}
 }
 
 contract ImplementationB {
